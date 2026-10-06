@@ -1,0 +1,388 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Case File #024</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #171715;
+            --ink: #111111;
+            --cream: #f7efd1;
+            --panel: #eddca2;
+            --mint: #bdddb7;
+            --olive: #5e6850;
+            --line: #111111;
+            --shadow: #0d0d0d;
+        }
+
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            background: linear-gradient(180deg, #181715 0%, #252221 100%);
+            color: var(--ink);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .page {
+            max-width: 1100px;
+            margin: 40px auto;
+            padding: 18px;
+        }
+
+        .shell {
+            background: rgba(247,239,209,0.95);
+            border: 4px solid var(--line);
+            box-shadow: 12px 12px 0 var(--shadow);
+            overflow: hidden;
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            background: #111111;
+            color: var(--cream);
+            padding: 16px 20px;
+            border-bottom: 4px solid var(--line);
+        }
+
+        .topbar h1 {
+            margin: 0;
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2rem, 2vw, 3rem);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 10px 12px;
+            border: 3px solid var(--line);
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            min-width: 130px;
+        }
+
+        .status-lost { background: #111; color: #f7efd1; }
+        .status-found { background: var(--mint); color: #111; }
+        .status-claimed { background: #f7efd1; color: #111; }
+        .status-pending { background: #323232; color: #f7efd1; }
+
+        .content {
+            display: grid;
+            grid-template-columns: 1.2fr 1fr;
+            gap: 0;
+        }
+
+        .visual {
+            background: linear-gradient(135deg, rgba(255,255,255,0.25), rgba(17,17,17,0.08));
+            border-right: 4px solid var(--line);
+            min-height: 440px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 26px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual::before {
+            content: "";
+            position: absolute;
+            inset: 18px;
+            border: 4px solid var(--line);
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(0,0,0,0.04),
+                rgba(0,0,0,0.04) 2px,
+                transparent 2px,
+                transparent 8px
+            );
+        }
+
+        .item-outline {
+            position: relative;
+            z-index: 1;
+            width: min(300px, 90%);
+            height: 300px;
+            border: 4px solid var(--line);
+            background: linear-gradient(180deg, rgba(17,17,17,0.8), rgba(17,17,17,0.95));
+            clip-path: polygon(30% 0%, 70% 0%, 100% 16%, 100% 100%, 0 100%, 0 16%);
+            box-shadow: 12px 12px 0 rgba(17,17,17,0.2);
+        }
+
+        .info {
+            padding: 26px 24px 18px;
+            display: flex;
+            flex-direction: column;
+            gap: 18px;
+        }
+
+        .field-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .meta-block {
+            border: 3px solid var(--line);
+            background: rgba(255,255,255,0.12);
+            padding: 12px 14px;
+        }
+
+        .meta-label {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.7rem;
+            opacity: 0.75;
+            margin-bottom: 6px;
+        }
+
+        .meta-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+        }
+
+        .description {
+            border: 3px solid var(--line);
+            background: rgba(255,255,255,0.12);
+            padding: 16px;
+            line-height: 1.7;
+        }
+
+        .timeline {
+            margin-top: 12px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            position: relative;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            bottom: 10px;
+            width: 3px;
+            background: var(--line);
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-left: 34px;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.08em;
+            font-size: 0.82rem;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: 0;
+            top: 2px;
+            width: 20px;
+            height: 20px;
+            border: 3px solid var(--line);
+            background: var(--cream);
+        }
+
+        .toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin-top: 22px;
+            flex-wrap: wrap;
+        }
+
+        .btn-row {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .btn {
+            appearance: none;
+            border: 3px solid var(--line);
+            background: var(--cream);
+            color: var(--ink);
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            padding: 10px 16px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .btn.primary { background: #ffeb7b; }
+        .btn.danger { background: #f1dc8d; }
+
+        .edit-form {
+            margin-top: 18px;
+            border-top: 4px solid var(--line);
+            padding-top: 18px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-size: 0.75rem;
+        }
+
+        .field.full { grid-column: 1 / -1; }
+        .field input, .field select, .field textarea {
+            border: 3px solid var(--line);
+            background: #fffaf0;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--ink);
+            resize: vertical;
+        }
+        .field textarea { min-height: 110px; }
+
+        @media (max-width: 820px) {
+            .content { grid-template-columns: 1fr; }
+            .visual { border-right: none; border-bottom: 4px solid var(--line); }
+            .field-row, .form-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+    <div class="page">
+        <div class="shell">
+            <div class="topbar">
+                <h1>Case File #024</h1>
+                <span class="status-badge status-found">FOUND</span>
+            </div>
+
+            <div class="content">
+                <div class="visual">
+                    <div class="item-outline" aria-label="Item illustration"></div>
+                </div>
+
+                <div class="info">
+                    <div>
+                        <div class="meta-label">Item Name</div>
+                        <div style="font-family:'Oswald',sans-serif; font-size:2.2rem; line-height:1; letter-spacing:0.06em; text-transform:uppercase; margin-top:6px;">Black Backpack</div>
+                    </div>
+
+                    <div class="description">
+                        A black backpack left in the library study room.
+                    </div>
+
+                    <div class="field-row">
+                        <div class="meta-block">
+                            <div class="meta-label">Category</div>
+                            <div class="meta-value">Bags</div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">Location</div>
+                            <div class="meta-value">Library</div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">Date</div>
+                            <div class="meta-value">2026-10-04</div>
+                        </div>
+                        <div class="meta-block">
+                            <div class="meta-label">Owner</div>
+                            <div class="meta-value">John Doe</div>
+                        </div>
+                    </div>
+
+                    <div>
+                        <div class="meta-label">Case Timeline</div>
+                        <div class="timeline">
+                            <div class="timeline-item">Case Created — 2026-10-04</div>
+                            <div class="timeline-item">Item Reported — Library</div>
+                            <div class="timeline-item">Status Logged — FOUND</div>
+                            <div class="timeline-item">Owner Contacted — John Doe</div>
+                        </div>
+                    </div>
+
+                    <div class="toolbar">
+                        <div class="btn-row">
+                            <a class="btn primary" href="#">Back to archive</a>
+                            <button class="btn" type="button" onclick="document.getElementById('editForm').scrollIntoView({behavior:'smooth'})">Edit case</button>
+                        </div>
+
+                        <form method="post" action="#">
+                            <button class="btn danger" type="submit" onclick="return confirm('ERASE CASE FILE?')">Delete</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+
+            <div class="edit-form" id="editForm">
+                <h2 style="font-family:'Oswald',sans-serif; text-transform:uppercase; letter-spacing:0.08em; margin:0 0 16px;">Edit Case File</h2>
+                <form method="post" action="#">
+                    <div class="form-grid">
+                        <label class="field">
+                            Item Name
+                            <input type="text" name="item_name" value="Black Backpack" required>
+                        </label>
+                        <label class="field">
+                            Category
+                            <input type="text" name="category" value="Bags" required>
+                        </label>
+                        <label class="field">
+                            Location
+                            <input type="text" name="location" value="Library" required>
+                        </label>
+                        <label class="field">
+                            Date
+                            <input type="date" name="date" value="2026-10-04" required>
+                        </label>
+                        <label class="field">
+                            Status
+                            <select name="status">
+                                <option value="Lost">Lost</option>
+                                <option value="Found" selected>Found</option>
+                                <option value="Claimed">Claimed</option>
+                                <option value="Pending">Pending</option>
+                            </select>
+                        </label>
+                        <label class="field">
+                            Owner Name
+                            <input type="text" name="owner_name" value="John Doe" required>
+                        </label>
+                        <label class="field full">
+                            Description
+                            <textarea name="description" required>A black backpack left in the library study room.</textarea>
+                        </label>
+                    </div>
+
+                    <div class="toolbar" style="margin-top:18px;">
+                        <div class="btn-row">
+                            <button class="btn primary" type="submit">Save changes</button>
+                            <a class="btn" href="#">Cancel</a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

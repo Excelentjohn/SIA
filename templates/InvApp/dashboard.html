@@ -3,209 +3,1025 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Foundly - Lost and Found Management System</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>Lost & Found Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #19191d;
+            --panel: #d6c25e;
+            --panel-dark: #aa9646;
+            --ink: #17171a;
+            --cream: #f1e6a7;
+            --mint: #9eb29c;
+            --olive: #6b704d;
+            --muted: #d3c994;
+            --line: #111114;
+            --shadow: #09090c;
+            --danger: #e3ca59;
+            --chip: #252528;
+        }
+
+        * { box-sizing: border-box; }
+
+        body {
+            margin: 0;
+            font-family: 'Inter', sans-serif;
+            background:
+                linear-gradient(rgba(10,10,10,0.08), rgba(10,10,10,0.12)),
+                radial-gradient(circle at 20% 0%, rgba(241, 230, 167, 0.10), transparent 18%),
+                var(--bg);
+            color: var(--cream);
+            min-height: 100vh;
+        }
+
+        body::before {
+            content: "";
+            position: fixed;
+            inset: 0;
+            pointer-events: none;
+            background-image: radial-gradient(rgba(241,230,167,0.14) 1px, transparent 1px);
+            background-size: 9px 9px;
+            opacity: 0.18;
+        }
+
+        a { color: inherit; text-decoration: none; }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 260px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: #202024;
+            color: var(--cream);
+            border-right: 4px solid var(--line);
+            padding: 24px 18px 18px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            inset: 10px 12px 0 auto;
+            width: 3px;
+            background: var(--line);
+            transform: rotate(16deg);
+            opacity: 0.4;
+        }
+
+        .brand {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.08em;
+            border: 4px solid var(--line);
+            background: var(--panel);
+            color: var(--ink);
+            padding: 14px 12px;
+            text-transform: uppercase;
+            margin-bottom: 24px;
+            transform: skew(-8deg);
+            box-shadow: 8px 8px 0 var(--shadow);
+        }
+
+        .brand-mark {
+            width: 18px;
+            height: 18px;
+            background: var(--ink);
+            transform: rotate(45deg);
+            display: inline-block;
+            border: 2px solid var(--ink);
+        }
+
+        .nav-section {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 18px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            padding: 12px 12px;
+            border: 3px solid rgba(241,230,167,0.36);
+            background: transparent;
+            color: var(--cream);
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            transition: transform 0.2s ease, background 0.2s ease;
+        }
+
+        .nav-item.active {
+            background: #e8d45a;
+            border-color: var(--panel);
+            color: var(--ink);
+            box-shadow: 4px 4px 0 var(--shadow);
+            transform: translate(-3px, -2px);
+        }
+
+        .nav-item:hover {
+            transform: translate(-3px, -2px);
+            background: rgba(232, 212, 90, 0.35);
+        }
+
+        .nav-item small {
+            font-size: 0.7rem;
+            opacity: 0.8;
+        }
+
+        .nav-footer {
+            margin-top: 22px;
+            border-top: 3px solid rgba(241,230,167,0.36);
+            padding-top: 18px;
+        }
+
+        .content {
+            padding: 26px 28px 32px;
+            background: rgba(18, 18, 18, 0.12);
+        }
+
+        .topbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 20px;
+            background: #252528;
+            color: var(--cream);
+            border: 4px solid rgba(241,230,167,0.28);
+            padding: 18px 22px;
+            box-shadow: 10px 10px 0 var(--shadow);
+            margin-bottom: 24px;
+        }
+
+        .title-stack {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 4px;
+        }
+
+        .eyebrow {
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.25em;
+            opacity: 0.8;
+            font-weight: 700;
+        }
+
+        .archive-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.2rem, 3vw, 3.1rem);
+            line-height: 0.9;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .workspace-tools {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+            flex-wrap: wrap;
+        }
+
+        .search-box {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            min-width: 260px;
+            background: #303035;
+            border: 3px solid rgba(241,230,167,0.4);
+            padding: 10px 12px;
+        }
+
+        .search-box input {
+            border: none;
+            background: transparent;
+            outline: none;
+            width: 100%;
+            font-size: 0.92rem;
+            font-family: 'Inter', sans-serif;
+            color: var(--cream);
+        }
+
+        .search-box input::placeholder { color: rgba(241,230,167,0.62); }
+
+        .pill {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background: #111114;
+            color: var(--cream);
+            border: 3px solid var(--panel-dark);
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.82rem;
+            letter-spacing: 0.08em;
+            padding: 8px 12px;
+            text-transform: uppercase;
+        }
+
+        .profile {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            background: #303035;
+            color: var(--cream);
+            border: 3px solid rgba(241,230,167,0.4);
+            padding: 7px 10px;
+        }
+
+        .avatar {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 3px solid var(--line);
+            background: linear-gradient(135deg, #d6c25e, #9eb29c);
+            display: grid;
+            place-items: center;
+            font-size: 0.7rem;
+            font-weight: 800;
+        }
+
+        .hero {
+            position: relative;
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 18px;
+            min-height: clamp(380px, 48vh, 520px);
+            border: 4px solid var(--line);
+            background-color: #19191d;
+            background-image:
+                linear-gradient(90deg, rgba(17,17,20,0.92) 0%, rgba(17,17,20,0.62) 50%, rgba(17,17,20,0.08) 100%),
+                url("/static/app_name/dio.jpg");
+            background-position: center, center 34%;
+            background-size: cover;
+            color: var(--cream);
+            padding: 18px 18px 14px;
+            overflow: hidden;
+            box-shadow: 12px 12px 0 var(--shadow);
+        }
+
+        .hero::before {
+            content: "";
+            position: absolute;
+            inset: 0;
+            background: repeating-linear-gradient(
+                135deg,
+                rgba(241,230,167,0.05),
+                rgba(241,230,167,0.05) 2px,
+                transparent 2px,
+                transparent 7px
+            );
+            pointer-events: none;
+        }
+
+        .hero-copy, .hero-art {
+            position: relative;
+            z-index: 1;
+        }
+
+        .hero-kicker {
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-size: 0.76rem;
+            opacity: 0.8;
+        }
+
+        .hero h1 {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.5rem, 4vw, 5rem);
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin: 8px 0 12px;
+            line-height: 0.9;
+            max-width: 620px;
+            color: #f0d85b;
+        }
+
+        .hero p {
+            margin: 0;
+            max-width: 560px;
+            font-size: 1rem;
+            line-height: 1.7;
+            font-weight: 600;
+        }
+
+        .hero-stats {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+            flex-wrap: wrap;
+        }
+
+        .stat-mini {
+            border: 3px solid rgba(241,230,167,0.75);
+            background: rgba(17,17,20,0.62);
+            color: var(--cream);
+            padding: 12px 14px;
+            min-width: 120px;
+            text-transform: uppercase;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        .stat-mini strong {
+            display: block;
+            font-size: 1.8rem;
+            letter-spacing: 0.04em;
+        }
+
+        .hero-art {
+            display: none;
+        }
+
+        .character-figure {
+            position: relative;
+            width: 100%;
+            height: 220px;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+
+        .character-figure::before {
+            content: "";
+            position: absolute;
+            width: 170px;
+            height: 170px;
+            background: rgba(17,17,17,0.08);
+            border: 4px solid var(--line);
+            transform: rotate(25deg);
+            bottom: -8px;
+        }
+
+        .silhouette {
+            position: relative;
+            width: 160px;
+            height: 180px;
+            background: rgba(17,17,17,0.88);
+            clip-path: polygon(34% 0%, 65% 0%, 83% 18%, 100% 100%, 0 100%, 18% 18%);
+            border: 4px solid var(--line);
+            box-shadow: 10px 10px 0 rgba(17,17,17,0.38);
+        }
+
+        .silhouette::before {
+            content: "";
+            position: absolute;
+            width: 90px;
+            height: 92px;
+            border: 4px solid var(--line);
+            border-top: 0;
+            background: rgba(241,230,167,0.14);
+            left: 35px;
+            top: 30px;
+            clip-path: polygon(50% 0%, 100% 100%, 0% 100%);
+        }
+
+        .stats-grid {
+            margin-top: 26px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(180px, 1fr));
+            gap: 16px;
+        }
+
+        .stat-card {
+            background: linear-gradient(180deg, #2c2b30 0%, #202024 100%);
+            color: var(--cream);
+            border: 4px solid rgba(214,194,94,0.7);
+            box-shadow: 8px 8px 0 var(--shadow);
+            padding: 18px 16px 14px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: "✦";
+            position: absolute;
+            right: 12px;
+            top: 10px;
+            font-size: 1.5rem;
+            opacity: 0.65;
+        }
+
+        .stat-card strong {
+            display: block;
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2.1rem, 2vw, 3rem);
+            line-height: 1;
+            margin-top: 10px;
+            letter-spacing: 0.05em;
+        }
+
+        .stat-label {
+            text-transform: uppercase;
+            letter-spacing: 0.14em;
+            font-size: 0.72rem;
+            font-weight: 800;
+        }
+
+        .stat-meta {
+            margin-top: 10px;
+            font-size: 0.7rem;
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            opacity: 0.7;
+        }
+
+        .section-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 12px;
+            margin: 28px 0 16px;
+            padding: 0 4px;
+        }
+
+        .section-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(1.8rem, 2vw, 2.5rem);
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            margin: 0;
+        }
+
+        .table-toolbar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 12px;
+            padding: 16px 18px;
+            border: 4px solid rgba(214,194,94,0.7);
+            background: #252528;
+            color: var(--cream);
+            box-shadow: 10px 10px 0 var(--shadow);
+        }
+
+        .filter-group {
+            display: flex;
+            flex-wrap: wrap;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .filter-btn, .primary-btn, .ghost-btn, .mini-btn {
+            appearance: none;
+            border: 3px solid var(--line);
+            background: var(--cream);
+            color: var(--ink);
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            padding: 10px 14px;
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+
+        .primary-btn {
+            background: #e8d45a;
+            box-shadow: 5px 5px 0 var(--shadow);
+        }
+
+        .ghost-btn {
+            background: #e7dca0;
+        }
+
+        .filter-btn.active,
+        .mini-btn.primary {
+            background: #e8d45a;
+        }
+
+        .filter-btn:hover,
+        .primary-btn:hover,
+        .ghost-btn:hover,
+        .mini-btn:hover {
+            transform: translate(-2px, -2px);
+        }
+
+        .table-shell {
+            margin-top: 18px;
+            border: 4px solid rgba(214,194,94,0.7);
+            background: #202024;
+            color: var(--cream);
+            box-shadow: 12px 12px 0 var(--shadow);
+            overflow: hidden;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        th, td {
+            padding: 16px 14px;
+            border-bottom: 3px solid rgba(241,230,167,0.18);
+            vertical-align: top;
+            text-align: left;
+        }
+
+        thead th {
+            background: #111;
+            color: var(--cream);
+            text-transform: uppercase;
+            letter-spacing: 0.12em;
+            font-size: 0.7rem;
+            font-family: 'Oswald', sans-serif;
+        }
+
+        tbody tr:hover {
+            background: rgba(241,230,167,0.08);
+        }
+
+        .case-file-title {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+            letter-spacing: 0.04em;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+        }
+
+        .case-file-meta {
+            font-size: 0.73rem;
+            color: rgba(241,230,167,0.7);
+            line-height: 1.5;
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 122px;
+            padding: 8px 10px;
+            border: 3px solid var(--line);
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.76rem;
+        }
+
+        .status-lost {
+            background: #111;
+            color: var(--cream);
+        }
+
+        .status-found {
+            background: var(--mint);
+            color: #111;
+        }
+
+        .status-claimed {
+            background: var(--cream);
+            color: #111;
+        }
+
+        .status-pending {
+            background: #34343a;
+            color: var(--cream);
+        }
+
+        .row-actions {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+        }
+
+        .mini-btn {
+            font-size: 0.7rem;
+            padding: 0.6rem 0.8rem;
+            background: #f6f0d4;
+        }
+
+        .mini-btn.delete {
+            background: var(--cream);
+        }
+
+        .category-grid {
+            margin-top: 16px;
+            display: grid;
+            grid-template-columns: repeat(4, minmax(150px, 1fr));
+            gap: 16px;
+        }
+
+        .category-card {
+            border: 4px solid rgba(214,194,94,0.7);
+            background: linear-gradient(145deg, #292a2a, #202024 68%, rgba(107,112,77,0.55));
+            color: var(--cream);
+            box-shadow: 8px 8px 0 var(--shadow);
+            padding: 16px 14px;
+        }
+
+        .category-card .big {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            letter-spacing: 0.06em;
+        }
+
+        .category-card .title {
+            margin-top: 6px;
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            letter-spacing: 0.06em;
+        }
+
+        .modal {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.56);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 50;
+            padding: 20px;
+        }
+
+        .modal.open {
+            display: flex;
+        }
+
+        .modal-card {
+            width: min(680px, 100%);
+            background: #252528;
+            color: var(--cream);
+            border: 4px solid var(--panel-dark);
+            box-shadow: 14px 14px 0 var(--shadow);
+            padding: 22px 22px 18px;
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 16px;
+            margin-bottom: 16px;
+        }
+
+        .modal-header h3 {
+            margin: 0;
+            font-family: 'Oswald', sans-serif;
+            font-size: clamp(2rem, 2vw, 2.7rem);
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+        }
+
+        .close-btn {
+            width: 38px;
+            height: 38px;
+            border: 3px solid rgba(241,230,167,0.4);
+            background: #303035;
+            color: var(--cream);
+            font-size: 1.6rem;
+            cursor: pointer;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+
+        .field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            font-family: 'Oswald', sans-serif;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+            font-size: 0.8rem;
+        }
+
+        .field.full {
+            grid-column: 1 / -1;
+        }
+
+        .field input,
+        .field select,
+        .field textarea {
+            border: 3px solid rgba(241,230,167,0.4);
+            background: #303035;
+            padding: 12px 14px;
+            font-size: 0.95rem;
+            color: var(--cream);
+            font-family: 'Inter', sans-serif;
+            resize: vertical;
+            min-height: 46px;
+        }
+
+        .field textarea {
+            min-height: 110px;
+        }
+
+        .modal-actions {
+            display: flex;
+            justify-content: space-end;
+            gap: 12px;
+            margin-top: 18px;
+        }
+
+        .muted {
+            opacity: 0.8;
+        }
+
+        @media (max-width: 1024px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { border-right: none; border-bottom: 4px solid var(--line); }
+            .stats-grid, .category-grid { grid-template-columns: repeat(2, minmax(140px, 1fr)); }
+            .hero { grid-template-columns: 1fr; }
+        }
+
+        @media (max-width: 680px) {
+            .content { padding: 18px 16px 24px; }
+            .topbar { flex-direction: column; align-items: stretch; }
+            .workspace-tools { width: 100%; }
+            .search-box { min-width: 0; flex: 1; }
+            .stats-grid, .category-grid, .form-grid { grid-template-columns: 1fr; }
+            .table-shell { overflow-x: auto; }
+            table { min-width: 700px; }
+        }
+    </style>
 </head>
-<body class="bg-light">
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand"><span class="brand-mark"></span> Archive</div>
 
-    <nav class="navbar navbar-dark bg-primary mb-4">
-        <div class="container">
-            <a class="navbar-brand fw-bold" href="#">Foundly</a>
-        </div>
-    </nav>
+            <nav class="nav-section" aria-label="Sidebar navigation">
+                <a class="nav-item active" href="#"><span>Dashboard</span><small>01</small></a>
+                <a class="nav-item" href="#"><span>Lost Items</span><small>02</small></a>
+                <a class="nav-item" href="#"><span>Found Items</span><small>03</small></a>
+                <a class="nav-item" href="#"><span>Cases</span><small>04</small></a>
+                <a class="nav-item" href="#"><span>Categories</span><small>05</small></a>
+                <a class="nav-item" href="#"><span>Locations</span><small>06</small></a>
+                <a class="nav-item" href="#"><span>Reports</span><small>07</small></a>
+            </nav>
 
-    <div class="container">
-        <div class="row g-4">
-            
-            <!-- FORM SECTION -->
-            <div class="col-lg-4">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white">
-                        <h5 class="card-title mb-0" id="formTitle">Report / Add Item</h5>
-                    </div>
-                    <div class="card-body">
-                        <form id="itemForm">
-                            <input type="hidden" id="editIndex" value="-1">
-
-                            <div class="mb-3">
-                                <label for="item_name" class="form-label">Item Name</label>
-                                <input type="text" class="form-control" id="item_name" required placeholder="e.g. Blue Umbrella">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="category" class="form-label">Category</label>
-                                <select class="form-select" id="category" required>
-                                    <option value="" disabled selected>Select category</option>
-                                    <option value="Electronics">Electronics</option>
-                                    <option value="Personal Items">Personal Items</option>
-                                    <option value="Books & Stationery">Books & Stationery</option>
-                                    <option value="Clothing & Accessories">Clothing & Accessories</option>
-                                    <option value="Others">Others</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="location" class="form-label">Location Found/Lost</label>
-                                <input type="text" class="form-control" id="location" required placeholder="e.g. Library 2nd Floor">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="date" class="form-label">Date</label>
-                                <input type="date" class="form-control" id="date" required>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="status" class="form-label">Status</label>
-                                <select class="form-select" id="status" required>
-                                    <option value="Lost">Lost</option>
-                                    <option value="Found">Found</option>
-                                    <option value="Claimed">Claimed</option>
-                                </select>
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="owner_name" class="form-label">Owner / Finder Name</label>
-                                <input type="text" class="form-control" id="owner_name" placeholder="e.g. Juan Dela Cruz">
-                            </div>
-
-                            <div class="mb-3">
-                                <label for="description" class="form-label">Description</label>
-                                <textarea class="form-control" id="description" rows="3" placeholder="Provide extra details..."></textarea>
-                            </div>
-
-                            <button type="submit" class="btn btn-primary w-100" id="saveBtn">Save Item</button>
-                            <button type="button" class="btn btn-secondary w-100 mt-2 d-none" id="cancelBtn" onclick="resetForm()">Cancel Edit</button>
-                        </form>
-                    </div>
-                </div>
+            <div class="nav-footer">
+                <a class="nav-item" href="#"><span>Settings</span><small>✦</small></a>
+                <a class="nav-item" href="#"><span>Profile</span><small>✦</small></a>
+                <a class="nav-item" href="#"><span>Logout</span><small>✦</small></a>
             </div>
+        </aside>
 
-            <!-- TABLE SECTION -->
-            <div class="col-lg-8">
-                <div class="card shadow-sm">
-                    <div class="card-header bg-white d-flex justify-content-between align-items-center">
-                        <h5 class="card-title mb-0">Lost & Found Items List</h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-hover align-middle mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th>Item Name</th>
-                                        <th>Category</th>
-                                        <th>Location</th>
-                                        <th>Date</th>
-                                        <th>Status</th>
-                                        <th>Owner/Finder</th>
-                                        <th class="text-center">Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody id="itemsTableBody">
-                                    <!-- Dynamic rows will appear here -->
-                                </tbody>
-                            </table>
+        <main class="content">
+            <header class="topbar">
+                <div class="title-stack">
+                    <span class="eyebrow">Archive / Case Management System</span>
+                    <h1 class="archive-title">Lost &amp; Found</h1>
+                </div>
+
+                <div class="workspace-tools">
+                    <form class="search-box" method="get" action="#">
+                        <span>⌕</span>
+                        <input type="text" name="search" value="" placeholder="Search case files..." aria-label="Search case files">
+                    </form>
+
+                    <span class="pill">24 Cases</span>
+                    <div class="profile">
+                        <div class="avatar">JD</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em;">John Doe</div>
+                            <div class="muted" style="font-size:0.72rem;">Archive Lead</div>
                         </div>
                     </div>
                 </div>
+            </header>
+
+            <section class="hero">
+                <div class="hero-copy">
+                    <div class="hero-kicker">Case Index</div>
+                    <h1>THE LOST OBJECT ARCHIVE</h1>
+                    <p>Every object has a story. Every case has an owner.</p>
+
+                    <div class="hero-stats">
+                        <div class="stat-mini"><strong>024</strong>Case Files</div>
+                        <div class="stat-mini"><strong>018</strong>Recovered</div>
+                        <div class="stat-mini"><strong>006</strong>Missing</div>
+                    </div>
+                </div>
+
+                <div class="hero-art" aria-hidden="true">
+                    <div class="character-figure">
+                        <div class="silhouette"></div>
+                    </div>
+                </div>
+            </section>
+
+            <section class="stats-grid" aria-label="Case statistics">
+                <article class="stat-card">
+                    <span class="stat-label">Total items</span>
+                    <strong>024</strong>
+                    <div class="stat-meta">Archive status / active</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Lost</span>
+                    <strong>008</strong>
+                    <div class="stat-meta">Alert priority / open</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Found</span>
+                    <strong>011</strong>
+                    <div class="stat-meta">Recovery status</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Active cases</span>
+                    <strong>006</strong>
+                    <div class="stat-meta">Unresolved records</div>
+                </article>
+            </section>
+
+            <div class="section-bar">
+                <h2 class="section-title">Case Files</h2>
+                <button class="primary-btn" type="button" onclick="openModal()">+ Add Case</button>
             </div>
 
+            <div class="table-toolbar">
+                <div class="filter-group" aria-label="Status filters">
+                    <button class="filter-btn active" type="button">All</button>
+                    <button class="filter-btn" type="button">Lost</button>
+                    <button class="filter-btn" type="button">Found</button>
+                    <button class="filter-btn" type="button">Claimed</button>
+                    <button class="filter-btn" type="button">Pending</button>
+                </div>
+
+                <div class="filter-group" aria-label="Filter selectors">
+                    <form method="get" action="#" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                        <select name="category" style="border:3px solid var(--line); background:#f6f0d4; padding:9px 10px; font-family:'Inter',sans-serif;">
+                            <option value="all">All categories</option>
+                            <option value="bags">Bags</option>
+                            <option value="books">Books</option>
+                            <option value="keys">Keys</option>
+                            <option value="electronics">Electronics</option>
+                        </select>
+                        <select name="location" style="border:3px solid var(--line); background:#f6f0d4; padding:9px 10px; font-family:'Inter',sans-serif;">
+                            <option value="all">All locations</option>
+                            <option value="library">Library</option>
+                            <option value="cafeteria">Cafeteria</option>
+                            <option value="science hall">Science Hall</option>
+                        </select>
+                        <button class="ghost-btn" type="submit">Filter</button>
+                    </form>
+                </div>
+            </div>
+
+            <section class="table-shell">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Owner</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>
+                                <div class="case-file-title">Black Backpack</div>
+                                <div class="case-file-meta">A black backpack left in the library study room.</div>
+                            </td>
+                            <td>Bags</td>
+                            <td>Library</td>
+                            <td>2026-10-04</td>
+                            <td><span class="status-badge status-found">FOUND</span></td>
+                            <td>John Doe</td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="mini-btn primary" type="button">VIEW</button>
+                                    <button class="mini-btn" type="button">EDIT</button>
+                                    <button class="mini-btn delete" type="button">DELETE</button>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>
+                                <div class="case-file-title">Silver Key</div>
+                                <div class="case-file-meta">A silver key recovered from the science labs.</div>
+                            </td>
+                            <td>Keys</td>
+                            <td>Science Hall</td>
+                            <td>2026-10-05</td>
+                            <td><span class="status-badge status-lost">LOST</span></td>
+                            <td>Jane Doe</td>
+                            <td>
+                                <div class="row-actions">
+                                    <button class="mini-btn primary" type="button">VIEW</button>
+                                    <button class="mini-btn" type="button">EDIT</button>
+                                    <button class="mini-btn delete" type="button">DELETE</button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </section>
+
+            <div class="section-bar">
+                <h2 class="section-title">Categories</h2>
+            </div>
+
+            <section class="category-grid" aria-label="Categories overview">
+                <article class="category-card">
+                    <div class="big">14</div>
+                    <div class="title">Electronics</div>
+                </article>
+                <article class="category-card">
+                    <div class="big">09</div>
+                    <div class="title">Bags</div>
+                </article>
+                <article class="category-card">
+                    <div class="big">06</div>
+                    <div class="title">Books</div>
+                </article>
+                <article class="category-card">
+                    <div class="big">05</div>
+                    <div class="title">Keys</div>
+                </article>
+            </section>
+        </main>
+    </div>
+
+    <div class="modal" id="caseModal" aria-hidden="true">
+        <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="caseModalTitle">
+            <div class="modal-header">
+                <h3 id="caseModalTitle">New Case File</h3>
+                <button type="button" class="close-btn" aria-label="Close" onclick="closeModal()">×</button>
+            </div>
+
+            <form method="post" action="#">
+                <div class="form-grid">
+                    <label class="field">
+                        Item Name
+                        <input type="text" name="item_name" placeholder="Black Backpack" required>
+                    </label>
+                    <label class="field">
+                        Category
+                        <input type="text" name="category" placeholder="Bags" required>
+                    </label>
+                    <label class="field">
+                        Location
+                        <input type="text" name="location" placeholder="Library" required>
+                    </label>
+                    <label class="field">
+                        Date
+                        <input type="date" name="date" required>
+                    </label>
+                    <label class="field">
+                        Status
+                        <select name="status">
+                            <option value="Lost">Lost</option>
+                            <option value="Found">Found</option>
+                            <option value="Claimed">Claimed</option>
+                            <option value="Pending">Pending</option>
+                        </select>
+                    </label>
+                    <label class="field">
+                        Owner Name
+                        <input type="text" name="owner_name" placeholder="John Doe" required>
+                    </label>
+                    <label class="field full">
+                        Description
+                        <textarea name="description" placeholder="Provide the object details and recovery notes..."></textarea>
+                    </label>
+                </div>
+
+                <div class="modal-actions">
+                    <button type="button" class="ghost-btn" onclick="closeModal()">Cancel</button>
+                    <button type="submit" class="primary-btn">Create Case</button>
+                </div>
+            </form>
         </div>
     </div>
 
-    <!-- JAVASCRIPT FOR CRUD -->
     <script>
-        let items = JSON.parse(localStorage.getItem('foundly_items')) || [];
-
-        function renderItems() {
-            const tbody = document.getElementById('itemsTableBody');
-            tbody.innerHTML = '';
-
-            if (items.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-4 text-muted">No lost or found items recorded yet.</td></tr>`;
-                return;
-            }
-
-            items.forEach((item, index) => {
-                let badgeClass = item.status === 'Lost' ? 'bg-danger' : item.status === 'Found' ? 'bg-warning text-dark' : 'bg-success';
-                
-                tbody.innerHTML += `
-                    <tr>
-                        <td>
-                            <strong>${item.name}</strong><br>
-                            <small class="text-muted">${item.description}</small>
-                        </td>
-                        <td>${item.category}</td>
-                        <td>${item.location}</td>
-                        <td>${item.date}</td>
-                        <td><span class="badge ${badgeClass}">${item.status}</span></td>
-                        <td>${item.owner}</td>
-                        <td class="text-center">
-                            <button class="btn btn-sm btn-outline-primary me-1" onclick="editItem(${index})">Edit</button>
-                            <button class="btn btn-sm btn-outline-danger" onclick="deleteItem(${index})">Delete</button>
-                        </td>
-                    </tr>
-                `;
-            });
+        function openModal() {
+            const modal = document.getElementById('caseModal');
+            modal.classList.add('open');
+            modal.setAttribute('aria-hidden', 'false');
         }
 
-        document.getElementById('itemForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const editIndex = parseInt(document.getElementById('editIndex').value);
+        function closeModal() {
+            const modal = document.getElementById('caseModal');
+            modal.classList.remove('open');
+            modal.setAttribute('aria-hidden', 'true');
+        }
 
-            const newItem = {
-                name: document.getElementById('item_name').value,
-                category: document.getElementById('category').value,
-                location: document.getElementById('location').value,
-                date: document.getElementById('date').value,
-                status: document.getElementById('status').value,
-                owner: document.getElementById('owner_name').value,
-                description: document.getElementById('description').value
-            };
-
-            if (editIndex === -1) {
-                items.push(newItem);
-            } else {
-                items[editIndex] = newItem;
+        document.addEventListener('keydown', function (event) {
+            if (event.key === 'Escape') {
+                closeModal();
             }
-
-            localStorage.setItem('foundly_items', JSON.stringify(items));
-            resetForm();
-            renderItems();
         });
-
-        function editItem(index) {
-            const item = items[index];
-            document.getElementById('editIndex').value = index;
-            document.getElementById('item_name').value = item.name;
-            document.getElementById('category').value = item.category;
-            document.getElementById('location').value = item.location;
-            document.getElementById('date').value = item.date;
-            document.getElementById('status').value = item.status;
-            document.getElementById('owner_name').value = item.owner;
-            document.getElementById('description').value = item.description;
-
-            document.getElementById('formTitle').innerText = 'Edit Item';
-            document.getElementById('saveBtn').innerText = 'Update Item';
-            document.getElementById('cancelBtn').classList.remove('d-none');
-        }
-
-        function deleteItem(index) {
-            if (confirm('Are you sure you want to delete this item?')) {
-                items.splice(index, 1);
-                localStorage.setItem('foundly_items', JSON.stringify(items));
-                renderItems();
-            }
-        }
-
-        function resetForm() {
-            document.getElementById('itemForm').reset();
-            document.getElementById('editIndex').value = -1;
-            document.getElementById('formTitle').innerText = 'Report / Add Item';
-            document.getElementById('saveBtn').innerText = 'Save Item';
-            document.getElementById('cancelBtn').classList.add('d-none');
-        }
-
-        renderItems();
     </script>
 </body>
 </html>
