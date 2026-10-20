@@ -1,0 +1,169 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lost & Found Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'app_name/archive.css' %}?v=2">
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand"><span class="brand-mark"></span> Archive</div>
+
+            <nav class="nav-section" aria-label="Sidebar navigation">
+                <a class="nav-item {% if section == 'dashboard' %}active{% endif %}" href="{% url 'dashboard' %}"><span>Dashboard</span><small>01</small></a>
+                <a class="nav-item {% if section == 'lost' %}active{% endif %}" href="{% url 'item_list' 'lost' %}"><span>Lost Items</span><small>02</small></a>
+                <a class="nav-item {% if section == 'found' %}active{% endif %}" href="{% url 'item_list' 'found' %}"><span>Found Items</span><small>03</small></a>
+                <a class="nav-item {% if section == 'cases' %}active{% endif %}" href="{% url 'cases' %}"><span>Cases</span><small>04</small></a>
+                <a class="nav-item" href="{% url 'categories' %}"><span>Categories</span><small>05</small></a>
+                <a class="nav-item" href="{% url 'locations' %}"><span>Locations</span><small>06</small></a>
+                <a class="nav-item" href="{% url 'reports' %}"><span>Reports</span><small>07</small></a>
+            </nav>
+
+            <div class="nav-footer">
+                <a class="nav-item" href="{% url 'profile' %}"><span>Profile</span></a>
+                <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-item" type="submit"><span>Logout</span></button></form>
+            </div>
+        </aside>
+
+        <main class="content">
+            <header class="topbar">
+                <div class="title-stack">
+                    <span class="eyebrow">Archive / Case Management System</span>
+                    <h1 class="archive-title">{{ page_heading }}</h1>
+                </div>
+
+                <div class="workspace-tools">
+                    <form class="search-box" method="get" action="{% if section == 'lost' %}{% url 'item_list' 'lost' %}{% elif section == 'found' %}{% url 'item_list' 'found' %}{% elif section == 'cases' %}{% url 'cases' %}{% else %}{% url 'dashboard' %}{% endif %}">
+                        
+                        <input type="text" name="search" value="{{ search_query }}" placeholder="Search case files..." aria-label="Search case files">
+                        <input type="hidden" name="status" value="{{ status_filter }}"><input type="hidden" name="category" value="{{ category_filter }}"><input type="hidden" name="location" value="{{ location_filter }}">
+                    </form>
+
+                    <span class="pill">{{ total_items }} Cases</span>
+                    <div class="profile">
+                        <div class="avatar">{% if archive_profile and archive_profile.photo %}<img src="{{ archive_profile.photo.url }}" alt="Profile photo">{% else %}{{ request.user.username|first|upper }}{% endif %}</div>
+                        <div>
+                            <div style="font-weight:700; font-size:0.78rem; text-transform:uppercase; letter-spacing:0.08em;">{{ request.user.get_full_name|default:request.user.username }}</div>
+                            <div class="muted" style="font-size:0.72rem;">Archive member</div>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            {% if messages %}<div role="status" style="padding:12px 16px;margin-bottom:16px;background:#252528;border:2px solid #d6c25e">{% for message in messages %}{{ message }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+
+            {% if section == 'dashboard' %}<section class="hero">
+                <div class="hero-copy">
+                    <div class="hero-kicker">Case Index</div>
+                    <h1>THE LOST OBJECT ARCHIVE</h1>
+                    <p>Every object has a story. Every case has an owner.</p>
+
+                    <div class="hero-stats">
+                        <div class="stat-mini"><strong>{{ case_files }}</strong>Case Files</div>
+                        <div class="stat-mini"><strong>{{ claimed_items }}</strong>Recovered</div>
+                        <div class="stat-mini"><strong>{{ lost_items }}</strong>Missing</div>
+                    </div>
+                </div>
+
+                <div class="hero-art" aria-hidden="true">
+                    <div class="character-figure">
+                        <div class="silhouette"></div>
+                    </div>
+                </div>
+            </section>{% endif %}
+
+            {% if section == 'dashboard' %}<section class="stats-grid" aria-label="Case statistics">
+                <article class="stat-card">
+                    <span class="stat-label">Total items</span>
+                    <strong>{{ total_items }}</strong>
+                    <div class="stat-meta">Archive status / active</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Lost</span>
+                    <strong>{{ lost_items }}</strong>
+                    <div class="stat-meta">Alert priority / open</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Found</span>
+                    <strong>{{ found_items }}</strong>
+                    <div class="stat-meta">Recovery status</div>
+                </article>
+                <article class="stat-card">
+                    <span class="stat-label">Active cases</span>
+                    <strong>{{ active_cases }}</strong>
+                    <div class="stat-meta">Unresolved records</div>
+                </article>
+            </section>{% endif %}
+
+            <div class="section-bar">
+                <h2 class="section-title">{{ page_heading }}</h2>
+                {% if section == 'lost' %}<a class="primary-btn" href="{% url 'item_create' %}?status=Lost">+ Report Lost Item</a>{% elif section == 'found' %}<a class="primary-btn" href="{% url 'item_create' %}?status=Found">+ Report Found Item</a>{% else %}<a class="primary-btn" href="{% url 'item_create' %}">+ Add Case</a>{% endif %}
+            </div>
+
+            <div class="table-toolbar">
+                {% if section != 'lost' and section != 'found' %}<div class="filter-group" aria-label="Status filters">
+                    <a class="filter-btn {% if not status_filter %}active{% endif %}" href="{% if section == 'cases' %}{% url 'cases' %}{% else %}{% url 'dashboard' %}{% endif %}">All</a>
+                    <a class="filter-btn {% if status_filter == 'Lost' %}active{% endif %}" href="?status=Lost&amp;search={{ search_query|urlencode }}&amp;category={{ category_filter|urlencode }}&amp;location={{ location_filter|urlencode }}">Lost</a>
+                    <a class="filter-btn {% if status_filter == 'Found' %}active{% endif %}" href="?status=Found&amp;search={{ search_query|urlencode }}&amp;category={{ category_filter|urlencode }}&amp;location={{ location_filter|urlencode }}">Found</a>
+                    <a class="filter-btn {% if status_filter == 'Claimed' %}active{% endif %}" href="?status=Claimed&amp;search={{ search_query|urlencode }}&amp;category={{ category_filter|urlencode }}&amp;location={{ location_filter|urlencode }}">Claimed</a>
+                    <a class="filter-btn {% if status_filter == 'Pending' %}active{% endif %}" href="?status=Pending&amp;search={{ search_query|urlencode }}&amp;category={{ category_filter|urlencode }}&amp;location={{ location_filter|urlencode }}">Pending</a>
+                </div>{% else %}<div class="filter-group"><span class="pill">Showing {{ page_heading|lower }}</span></div>{% endif %}
+
+                <div class="filter-group" aria-label="Filter selectors">
+                    <form method="get" action="{% if section == 'lost' %}{% url 'item_list' 'lost' %}{% elif section == 'found' %}{% url 'item_list' 'found' %}{% elif section == 'cases' %}{% url 'cases' %}{% else %}{% url 'dashboard' %}{% endif %}" style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+                        <input type="hidden" name="search" value="{{ search_query }}"><input type="hidden" name="status" value="{{ status_filter }}">
+                        <select name="category" style="border:3px solid var(--line); background:#f6f0d4; padding:9px 10px; font-family:'Inter',sans-serif;">
+                            <option value="all" {% if not category_filter %}selected{% endif %}>All categories</option>
+                            {% for value in categories %}<option value="{{ value.name }}" {% if category_filter == value.name %}selected{% endif %}>{{ value.name }}</option>{% endfor %}
+                        </select>
+                        <select name="location" style="border:3px solid var(--line); background:#f6f0d4; padding:9px 10px; font-family:'Inter',sans-serif;">
+                            <option value="all" {% if not location_filter %}selected{% endif %}>All locations</option>
+                            {% for value in locations %}<option value="{{ value.name }}" {% if location_filter == value.name %}selected{% endif %}>{{ value.name }}</option>{% endfor %}
+                        </select>
+                        <button class="ghost-btn" type="submit">Filter</button>
+                    </form>
+                </div>
+            </div>
+
+            {% if invalid_filter %}<p role="status">An unknown filter was ignored. Showing results for the remaining filters.</p>{% endif %}
+            <section class="table-shell">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Item</th>
+                            <th>Category</th>
+                            <th>Location</th>
+                            <th>Date</th>
+                            <th>Status</th>
+                            <th>Owner</th>
+                            <th>Action</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for item in items %}<tr>
+                            <td><div class="case-file-title">{{ item.item_name }}</div><div class="case-file-meta">{{ item.description }}</div></td>
+                            <td>{{ item.category }}</td><td>{{ item.location }}</td><td>{{ item.date }}</td>
+                            <td><span class="status-badge status-{{ item.status|lower }}">{{ item.status|upper }}</span></td><td>{{ item.owner_name }}</td>
+                            <td><div class="row-actions"><a class="mini-btn primary" href="{% url 'case_detail' item.pk %}">VIEW</a><a class="mini-btn" href="{% url 'item_edit' item.pk %}">EDIT</a><form method="post" action="{% url 'delete_case' item.pk %}" onsubmit="return confirm('Delete this record?')">{% csrf_token %}<input type="hidden" name="return_to" value="{{ section }}"><button class="mini-btn delete" type="submit">DELETE</button></form></div></td>
+                        </tr>{% empty %}<tr><td colspan="7">No records found. Try changing your search or filters.</td></tr>{% endfor %}
+                    </tbody>
+                </table>
+            </section>
+
+            {% if section == 'dashboard' %}<div class="section-bar">
+                <h2 class="section-title">Categories</h2>
+            </div>
+
+            <section class="category-grid" aria-label="Categories overview">
+                {% for group in category_counts %}<article class="category-card"><div class="big">{{ group.total }}</div><div class="title">{{ group.name }}</div></article>{% empty %}<p>No categories recorded yet.</p>{% endfor %}
+            </section>{% endif %}
+        </main>
+    </div>
+</body>
+</html>

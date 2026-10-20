@@ -1,0 +1,43 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>{{ item.item_name }} - Archive</title>
+    <style>
+        body{margin:0;background:#19191d;color:#f1e6a7;font:16px Inter,Arial,sans-serif}
+        .page{max-width:950px;margin:5vh auto;padding:20px}
+        .shell{background:#252528;border:4px solid #b9a94d;box-shadow:12px 12px #09090c}
+        .top{background:#202024;color:#f1e6a7;padding:20px}
+        .content{padding:28px}.grid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+        .cell{padding:14px;border:2px solid #77704b}.label{text-transform:uppercase;font-size:.75rem;color:#c6bb7b}
+        a,button{display:inline-block;padding:10px 14px;margin:8px 6px 0 0;background:#e8d45a;color:#17171a;border:2px solid #111;text-decoration:none;cursor:pointer}
+        form{display:inline}.messages{padding:12px;border:2px solid #b9a94d;margin-bottom:18px}
+        @media(max-width:600px){.grid{grid-template-columns:1fr}}
+    </style>
+</head>
+<body>
+<main class="page"><article class="shell">
+    <header class="top"><h1>Case #{{ item.pk }} - {{ item.status|upper }}</h1></header>
+    <section class="content">
+        {% if messages %}<div class="messages" role="status">{% for message in messages %}{{ message }}{% if not forloop.last %}<br>{% endif %}{% endfor %}</div>{% endif %}
+        <h2>{{ item.item_name }}</h2><p>{{ item.description|linebreaksbr }}</p>
+        <div class="grid">
+            <div class="cell"><div class="label">Category</div>{{ item.category }}</div>
+            <div class="cell"><div class="label">Location</div>{{ item.location }}</div>
+            <div class="cell"><div class="label">Date reported</div>{{ item.date }}</div>
+            <div class="cell"><div class="label">Owner / reporter</div>{{ item.owner_name }}</div>
+            {% if item.date_found %}<div class="cell"><div class="label">Date found</div>{{ item.date_found }}</div><div class="cell"><div class="label">Found by</div>{{ item.found_by }}</div>{% endif %}
+        </div>
+        <p>
+            <a href="{% url 'dashboard' %}">Back to archive</a>
+            <a href="{% url 'item_edit' item.pk %}">Edit case</a>
+            {% if item.status|lower == 'lost' or item.status|lower == 'pending' %}<form method="post" action="{% url 'transition_case' item.pk 'Found' %}">{% csrf_token %}<button type="submit">Mark as Found</button></form>{% endif %}
+            {% if item.status|lower == 'pending' %}<form method="post" action="{% url 'transition_case' item.pk 'Lost' %}">{% csrf_token %}<button type="submit">Mark as Lost</button></form>{% endif %}
+            {% if item.status|lower == 'found' %}<form method="post" action="{% url 'transition_case' item.pk 'Claimed' %}">{% csrf_token %}<button type="submit">Confirm Recovery / Mark Claimed</button></form>{% endif %}
+            <form method="post" action="{% url 'delete_case' item.pk %}" onsubmit="return confirm('Delete this case?')">{% csrf_token %}<button type="submit">Delete</button></form>
+        </p>
+    </section>
+</article></main>
+</body>
+</html>

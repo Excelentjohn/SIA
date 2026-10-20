@@ -1,0 +1,98 @@
+﻿{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Lost &amp; Found Archive</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'app_name/archive.css' %}?v=2">
+    <style>
+        .profile-banner{position:relative;overflow:hidden;padding:30px 32px;background:linear-gradient(115deg,rgba(17,17,20,.96),rgba(37,37,40,.82)),url("/static/app_name/dio.jpg") center 35%/cover;border:4px solid var(--line);box-shadow:10px 10px var(--shadow);color:var(--cream)}
+        .profile-banner:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(135deg,rgba(241,230,167,.04),rgba(241,230,167,.04) 2px,transparent 2px,transparent 8px);pointer-events:none}
+        .profile-banner h2{position:relative;z-index:1;margin:0;font:600 clamp(1.8rem,3vw,2.8rem) 'Oswald',sans-serif;letter-spacing:.06em;text-transform:uppercase;color:#f0d85b}
+        .profile-banner p{position:relative;z-index:1;margin:8px 0 0;color:var(--cream)}
+        .profile-identity{display:flex;align-items:center;gap:22px;padding:22px;margin-top:-2px;background:#252528;border:4px solid rgba(241,230,167,.3);box-shadow:8px 8px var(--shadow)}
+        .profile-avatar{width:126px;height:126px;flex:0 0 126px;display:grid;place-items:center;overflow:hidden;border:5px solid var(--panel);background:linear-gradient(135deg,#d6c25e,#6b704d);color:var(--ink);font:700 3.2rem 'Oswald',sans-serif;text-transform:uppercase}
+        .profile-avatar img{width:100%;height:100%;object-fit:cover}
+        .profile-name{margin:0;color:var(--cream);font:600 clamp(1.8rem,3vw,2.5rem) 'Oswald',sans-serif;letter-spacing:.04em;text-transform:uppercase}
+        .profile-handle{margin:5px 0 12px;color:var(--muted)}
+        .member-tag{display:inline-block;padding:7px 10px;border:2px solid var(--panel-dark);background:#111114;color:var(--cream);font:500 .8rem 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+        .profile-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin:24px 0}
+        .profile-stat{padding:16px;background:#252528;border:3px solid rgba(241,230,167,.35);box-shadow:5px 5px var(--shadow)}
+        .profile-stat strong{display:block;color:#f0d85b;font:600 2rem 'Oswald',sans-serif}
+        .profile-stat span{font:500 .8rem 'Oswald',sans-serif;letter-spacing:.1em;text-transform:uppercase}
+        .profile-columns{display:grid;grid-template-columns:minmax(220px,.75fr) minmax(0,1.5fr);gap:20px;align-items:start}
+        .profile-panel{padding:20px;background:#252528;border:3px solid rgba(241,230,167,.35);box-shadow:7px 7px var(--shadow);color:var(--cream)}
+        .profile-panel h3{margin:0 0 16px;font:600 1.35rem 'Oswald',sans-serif;letter-spacing:.08em;text-transform:uppercase;color:#f0d85b}
+        .account-line{padding:12px 0;border-top:1px solid rgba(241,230,167,.22)}
+        .account-line small{display:block;margin-bottom:5px;color:var(--muted);font-size:.68rem;font-weight:700;letter-spacing:.14em;text-transform:uppercase}
+        .account-line strong{overflow-wrap:anywhere}
+        .profile-form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px 16px}
+        .profile-form-grid .field{color:var(--cream)}
+        .profile-form-grid .wide{grid-column:1/-1}
+        .profile-form-grid input,.profile-form-grid textarea{width:100%;padding:11px 12px;border:2px solid var(--panel-dark);background:#303035;color:var(--cream);font:inherit}
+        .profile-form-grid input[type=file]{font-size:.83rem}
+        .profile-form-grid input:focus,.profile-form-grid textarea:focus{outline:2px solid var(--panel);outline-offset:2px}
+        .profile-errors{margin:6px 0 0;color:#ffd7a1;font-size:.84rem}
+        .photo-note{margin:6px 0 0;color:var(--muted);font-size:.78rem}
+        .profile-actions{display:flex;gap:10px;flex-wrap:wrap;margin-top:18px}
+        .profile-actions .primary-btn,.profile-actions .ghost-btn{display:inline-block;text-decoration:none}
+        @media(max-width:800px){.profile-columns{grid-template-columns:1fr}}
+        @media(max-width:560px){.profile-identity{align-items:flex-start;flex-direction:column}.profile-avatar{width:100px;height:100px;flex-basis:100px}.profile-stats{grid-template-columns:1fr}.profile-form-grid{grid-template-columns:1fr}.profile-form-grid .wide{grid-column:auto}.profile-banner{padding:24px 20px}}
+    </style>
+</head>
+<body>
+<div class="layout">
+    <aside class="sidebar">
+        <div class="brand"><span class="brand-mark"></span> Archive</div>
+        <nav class="nav-section" aria-label="Sidebar navigation">
+            <a class="nav-item" href="{% url 'dashboard' %}"><span>Dashboard</span><small>01</small></a>
+            <a class="nav-item" href="{% url 'item_list' 'lost' %}"><span>Lost Items</span><small>02</small></a>
+            <a class="nav-item" href="{% url 'item_list' 'found' %}"><span>Found Items</span><small>03</small></a>
+            <a class="nav-item" href="{% url 'cases' %}"><span>Cases</span><small>04</small></a>
+            <a class="nav-item" href="{% url 'categories' %}"><span>Categories</span><small>05</small></a>
+            <a class="nav-item" href="{% url 'locations' %}"><span>Locations</span><small>06</small></a>
+            <a class="nav-item" href="{% url 'reports' %}"><span>Reports</span><small>07</small></a>
+        </nav>
+        <div class="nav-footer">
+            <a class="nav-item active" href="{% url 'profile' %}"><span>Profile</span></a>
+            <form method="post" action="{% url 'logout' %}">{% csrf_token %}<button class="nav-item" type="submit"><span>Logout</span></button></form>
+        </div>
+    </aside>
+    <main class="content">
+        <header class="topbar">
+            <div class="title-stack"><span class="eyebrow">Archive / Account</span><h1 class="archive-title">My Profile</h1></div>
+            <div class="workspace-tools"><span class="pill">Archive member</span><a class="ghost-btn" href="{% url 'dashboard' %}">Back to archive</a></div>
+        </header>
+        {% if messages %}<div role="status" style="padding:12px 16px;margin-bottom:16px;background:#252528;border:2px solid #d6c25e">{% for message in messages %}<p>{{ message }}</p>{% endfor %}</div>{% endif %}
+        <section class="profile-banner"><h2>Archive identity</h2><p>Your account details and archive profile.</p></section>
+        <section class="profile-identity">
+            <div class="profile-avatar">{% if archive_profile.photo %}<img src="{{ archive_profile.photo.url }}" alt="Profile photo for {{ request.user.username }}">{% else %}{{ request.user.first_name|first|default:request.user.username|first|upper }}{% endif %}</div>
+            <div><h2 class="profile-name">{{ request.user.get_full_name|default:request.user.username }}</h2><p class="profile-handle">@{{ request.user.username }}{% if request.user.email %} | {{ request.user.email }}{% endif %}</p><span class="member-tag">Lost &amp; Found Archive member</span>{% if archive_profile.bio %}<p>{{ archive_profile.bio }}</p>{% endif %}</div>
+        </section>
+        <section class="profile-stats" aria-label="Archive overview">
+            <article class="profile-stat"><strong>{{ total_items }}</strong><span>Items in archive</span></article>
+            <article class="profile-stat"><strong>{{ lost_items }}</strong><span>Reported lost</span></article>
+            <article class="profile-stat"><strong>{{ found_items }}</strong><span>Reported found</span></article>
+        </section>
+        <section class="profile-columns">
+            <aside class="profile-panel"><h3>Account details</h3><div class="account-line"><small>Username</small><strong>{{ request.user.username }}</strong></div><div class="account-line"><small>Email</small><strong>{{ request.user.email|default:'Not provided' }}</strong></div><div class="account-line"><small>Member since</small><strong>{{ request.user.date_joined|date:'F j, Y' }}</strong></div><div class="account-line"><small>Account type</small><strong>{% if request.user.is_staff %}Staff{% else %}Standard member{% endif %}</strong></div></aside>
+            <section class="profile-panel"><h3>Edit profile</h3><form method="post" enctype="multipart/form-data">{% csrf_token %}
+                {% if user_form.non_field_errors %}<div class="profile-errors">{{ user_form.non_field_errors }}</div>{% endif %}{% if archive_form.non_field_errors %}<div class="profile-errors">{{ archive_form.non_field_errors }}</div>{% endif %}
+                <div class="profile-form-grid">
+                    <label class="field">First name {{ user_form.first_name }}{% for error in user_form.first_name.errors %}<span class="profile-errors">{{ error }}</span>{% endfor %}</label>
+                    <label class="field">Last name {{ user_form.last_name }}{% for error in user_form.last_name.errors %}<span class="profile-errors">{{ error }}</span>{% endfor %}</label>
+                    <label class="field wide">Email address {{ user_form.email }}{% for error in user_form.email.errors %}<span class="profile-errors">{{ error }}</span>{% endfor %}</label>
+                    <label class="field wide">Profile photo {{ archive_form.photo }}{% for error in archive_form.photo.errors %}<span class="profile-errors">{{ error }}</span>{% endfor %}<span class="photo-note">JPG, PNG, or WebP - up to 5 MB</span></label>
+                    <label class="field wide">About you {{ archive_form.bio }}{% for error in archive_form.bio.errors %}<span class="profile-errors">{{ error }}</span>{% endfor %}</label>
+                </div>
+                <div class="profile-actions"><button class="primary-btn" type="submit">Save profile</button><a class="ghost-btn" href="{% url 'dashboard' %}">Cancel</a></div>
+            </form></section>
+        </section>
+    </main>
+</div>
+</body>
+</html>
